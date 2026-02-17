@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Debug files
+debug_*.html
+
+# Secrets
+google AI studio API.txt
+
+# Editor
+.vscode/
+.idea/
