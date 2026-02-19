@@ -54,6 +54,8 @@ with st.sidebar:
     st.info("API 키가 없으면 기술 분석만 수행됩니다.")
     st.divider()
     st.markdown("Developed by Antigravity")
+    # AdSense Verification Text (Visible for crawlers)
+    st.caption("AdSense: google.com, pub-8764053427630602, DIRECT, f08c47fec0942fa0")
 
 # Main Content
 col1, col2 = st.columns([1, 1])
