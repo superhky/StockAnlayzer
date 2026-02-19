@@ -1,4 +1,14 @@
 import streamlit as st
+
+# Google AdSense Verification & Auto Ads (Must be at the top)
+st.markdown("""
+    <head>
+    <meta name="google-adsense-account" content="ca-pub-8764053427630602">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8764053427630602"
+     crossorigin="anonymous"></script>
+    </head>
+    """, unsafe_allow_html=True)
+
 import pandas as pd
 from analyzer import StockAnalyzer
 import plotly.graph_objects as go
@@ -6,13 +16,6 @@ from datetime import datetime
 
 # Page config
 st.set_page_config(page_title="Pro Stock Analyzer", layout="wide", initial_sidebar_state="expanded")
-
-# Google AdSense Auto Ads & Verification
-st.markdown("""
-    <meta name="google-adsense-account" content="ca-pub-8764053427630602">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8764053427630602"
-     crossorigin="anonymous"></script>
-    """, unsafe_allow_html=True)
 
 # Custom CSS for Premium Look
 st.markdown("""
@@ -48,6 +51,8 @@ st.markdown("### 한국 및 미국 주식 기술적 분석 및 AI 전략 리포�
 # Sidebar
 with st.sidebar:
     st.header("Settings")
+    # AdSense verification hidden for users but visible to crawlers
+    st.markdown('<div style="display:none">google.com, pub-8764053427630602, DIRECT, f08c47fec0942fa0</div>', unsafe_allow_html=True)
     api_key = st.text_input("Gemini API Key", type="password", help="Get your key from Google AI Studio")
     st.info("API 키가 없으면 기술 분석만 수행됩니다.")
     st.divider()
