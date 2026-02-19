@@ -7,8 +7,9 @@ from datetime import datetime
 # Page config
 st.set_page_config(page_title="Pro Stock Analyzer", layout="wide", initial_sidebar_state="expanded")
 
-# Google AdSense Auto Ads
+# Google AdSense Auto Ads & Verification
 st.markdown("""
+    <meta name="google-adsense-account" content="ca-pub-8764053427630602">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8764053427630602"
      crossorigin="anonymous"></script>
     """, unsafe_allow_html=True)
