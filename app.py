@@ -3,14 +3,13 @@ import streamlit as st
 # Page config (MUST be the first Streamlit command)
 st.set_page_config(page_title="Pro Stock Analyzer", layout="wide", initial_sidebar_state="expanded")
 
-# Google AdSense Verification & Auto Ads
+# Google AdSense Verification (Must be close to the top)
 st.markdown("""
-    <div style="display:none">
+<div style="display:none; visibility:hidden;">
     <meta name="google-adsense-account" content="ca-pub-8764053427630602">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8764053427630602"
-     crossorigin="anonymous"></script>
-    </div>
-    """, unsafe_allow_html=True)
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8764053427630602" crossorigin="anonymous"></script>
+</div>
+""", unsafe_allow_html=True)
 
 import pandas as pd
 
