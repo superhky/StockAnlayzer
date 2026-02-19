@@ -48,8 +48,10 @@ st.markdown("### 한국 및 미국 주식 기술적 분석 및 AI 전략 리포�
 # Sidebar
 with st.sidebar:
     st.header("Settings")
-    # AdSense verification hidden for users but visible to crawlers
-    st.markdown('<div style="display:none">google.com, pub-8764053427630602, DIRECT, f08c47fec0942fa0</div>', unsafe_allow_html=True)
+    # AdSense Verification String (Visible and Prominent for crawlers)
+    st.write("---")
+    st.caption("Verification ID: google.com, pub-8764053427630602, DIRECT, f08c47fec0942fa0")
+    st.write("---")
     api_key = st.text_input("Gemini API Key", type="password", help="Get your key from Google AI Studio")
     st.info("API 키가 없으면 기술 분석만 수행됩니다.")
     st.divider()
