@@ -6,6 +6,10 @@ from ta.volatility import BollingerBands
 import requests
 from bs4 import BeautifulSoup
 import os
+import re
+import google.generativeai as genai
+from datetime import datetime
+import pytz
 
 class StockAnalyzer:
     def __init__(self):
@@ -26,7 +30,6 @@ class StockAnalyzer:
             return name
 
         # 3. Detect Korean characters
-        import re
         is_korean = bool(re.search('[가-힣]', name))
 
         # 4. Use yfinance search
@@ -44,7 +47,6 @@ class StockAnalyzer:
         # 5. AI Fallback (If API key provided)
         if api_key and len(name) > 1:
             try:
-                import google.generativeai as genai
                 genai.configure(api_key=api_key)
                 # Use a fast model for this
                 model = genai.GenerativeModel('gemini-1.5-flash')
@@ -70,9 +72,6 @@ class StockAnalyzer:
                     naver_data = self._fetch_naver_price(ticker)
                     if naver_data:
                         # Prepare Naver data row
-                        import pandas as pd
-                        from datetime import datetime
-                        import pytz
                         
                         tz = pytz.timezone('Asia/Seoul')
                         now = datetime.now(tz)
@@ -205,7 +204,6 @@ class StockAnalyzer:
                 return None
                 
             text = dl.get_text()
-            import re
             
             def extract_value(key, text):
                 pattern = rf"{key}\s+([\d,]+)"
@@ -268,7 +266,6 @@ class StockAnalyzer:
             return "API Key is required for AI analysis."
 
         try:
-            import google.generativeai as genai
             genai.configure(api_key=api_key)
             
             # Dynamically find an available model

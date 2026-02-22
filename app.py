@@ -12,6 +12,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 import pandas as pd
+import plotly.graph_objects as go
+from analyzer import StockAnalyzer
 
 # Custom CSS for Premium Look
 st.markdown("""
