@@ -40,7 +40,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🚀 Pro Stock AI Analyzer")
+st.title("📈 AI Stock Analyzer")
 st.markdown("### 한국 및 미국 주식 기술적 분석 및 AI 전략 리포트")
 
 # Sidebar
@@ -55,7 +55,8 @@ with st.sidebar:
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    symbol = st.text_input("종목 이름 또는 티커 (예: 삼성전자, AAPL, 005930)", placeholder="삼성전자")
+    symbol = st.text_input("종목 티커 또는 영어 이름 (예: 005930, AAPL, Tesla)", placeholder="005930")
+    st.caption("💡 **도움말**: 한국 주식은 **6자리 숫자 티커**를 입력해 주세요. 미국 주식은 **티커 또는 영어 기업명** 인식이 가능합니다.")
     purchase_price = st.number_input("평균 매수 가격 (단위: 원 또는 달러)", min_value=0.0, value=0.0, format="%.2f", help="보유 중인 경우 입력하세요. 신규 진입이라면 0으로 두세요.")
 
 if symbol:
@@ -64,7 +65,7 @@ if symbol:
     
     if st.button("분석 시작"):
         # Show a resolving message if it's likely a name
-        with st.spinner(f"'{symbol}' 티커 확인 및 분석 중..."):
+        with st.spinner(f"'{symbol}' 분석 중..."):
             resolved_ticker = analyzer.get_ticker(symbol, api_key=api_key)
             st.session_state['resolved_ticker'] = resolved_ticker
             
@@ -145,7 +146,7 @@ if symbol:
                     st.warning("AI 분석을 보려면 사이드바에 Gemini API Key를 입력하세요.")
 
 else:
-    st.info("종목 이름이나 티커를 입력하고 '분석 시작' 버튼을 누르세요.")
+    st.info("종목 티커를 입력하고 '분석 시작' 버튼을 누르세요.")
     
     # Information Section for AdSense (Add more text content)
     st.divider()
@@ -154,14 +155,14 @@ else:
         st.markdown("#### 📈 주요 기능")
         st.markdown("""
         - **기술적 지표 분석**: RSI, MACD, 볼린저 밴드 등 핵심 지표 실시간 계산
-        - **인공지능 리포트**: Google Gemini AI를 활용한 맞춤형 투자 전략 제안
         - **최신 뉴스 통합**: 종목별 주요 뉴스를 한눈에 확인
+        - **인공지능 리포트**: 종목별 주요 뉴스와 기술적 지표 분석을 바탕으로 맞춤형 투자 전략 제안
         """)
     with col_info2:
         st.markdown("#### 💡 사용 방법")
         st.markdown("""
         1. 왼쪽 사이드바에 **Gemini API Key**를 입력합니다 (선택 사항).
-        2. 분석하고 싶은 **종목명 또는 티커**를 입력합니다.
+        2. 분석하고 싶은 **종목 티커 또는 영어 이름**을 입력합니다.
         3. '분석 시작' 버튼을 눌러 결과 보고서를 확인합니다.
         """)
 
