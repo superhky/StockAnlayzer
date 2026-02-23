@@ -119,17 +119,15 @@ if symbol:
                 
                 # 3. News
                 news = analyzer.fetch_news(resolved_ticker)
-                with st.expander("최신 관련 뉴스"):
+                with st.expander("최신 관련 뉴스", expanded=True):
                     if not news:
-                        st.write("최근 뉴스 데이터가 없습니다.")
-                    for item in news:
-                        title = item.get('title', '제목 없음')
-                        link = item.get('link', '#')
-                        if link and link != '#':
-                            # Use Streamlit's official link button for reliability
-                            st.link_button(f"🔗 {title}", link, use_container_width=True)
-                        else:
-                            st.write(f"- {title} (링크 없음)")
+                        st.info("최근 24시간 내 관련 뉴스가 없거나 링크를 불러올 수 없습니다.")
+                    else:
+                        for item in news:
+                            title = item.get('title', '뉴스 제목 없음')
+                            link = item.get('link')
+                            if link and link.startswith('http'):
+                                st.link_button(f"🔗 {title}", link, use_container_width=True)
                 
                 # 4. AI Analysis
                 if api_key:
