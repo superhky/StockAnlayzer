@@ -123,7 +123,11 @@ if symbol:
                     for item in news:
                         title = item.get('title', '제목 없음')
                         link = item.get('link', '#')
-                        st.markdown(f"- [{title}]({link})")
+                        if link and link != '#':
+                            # Use HTML to ensure opening in a new tab
+                            st.markdown(f'<a href="{link}" target="_blank" style="text-decoration:none; color:#4dabf7;">- {title}</a>', unsafe_allow_html=True)
+                        else:
+                            st.markdown(f"- {title} (링크 없음)")
                 
                 # 4. AI Analysis
                 if api_key:

@@ -179,22 +179,36 @@ class StockAnalyzer:
                 content = item.get('content', item)
                 title = content.get('title') or content.get('heading') or item.get('title', 'No Title')
                 
-                # Extract link from various possible locations in yfinance structure
+                # Check multiple potential URL locations
                 link = '#'
+                # 1. Check canonical and clickThrough nested objects
                 if isinstance(content.get('canonicalUrl'), dict):
                     link = content['canonicalUrl'].get('url', '#')
                 elif isinstance(content.get('clickThroughUrl'), dict):
                     link = content['clickThroughUrl'].get('url', '#')
                 
-                # Fallback to older structure or direct keys
-                if link == '#':
+                # 2. Check previewUrl (common in yfinance for some news items)
+                if link == '#' or not link:
+                    link = content.get('previewUrl', '#')
+                
+                # 3. Fallback to common keys
+                if link == '#' or not link:
                     link = content.get('link') or content.get('url') or item.get('link', '#')
                 
-                if title != 'No Title':
+                # 4. Handle relative paths (e.g., from Yahoo Finance internal links)
+                if link.startswith('/'):
+                    link = f"https://finance.yahoo.com{link}"
+                elif link.startswith('m/'): # Another common internal format
+                    link = f"https://finance.yahoo.com/{link}"
+                
+                # Only add news that has a seemingly valid link
+                if title != 'No Title' and link and link != '#':
                     processed_news.append({
                         'title': title,
                         'link': link
                     })
+            
+            return processed_news
             
             return processed_news
         except Exception as e:
