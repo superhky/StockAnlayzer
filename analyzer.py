@@ -178,7 +178,17 @@ class StockAnalyzer:
             for item in raw_news[:5]:
                 content = item.get('content', item)
                 title = content.get('title') or content.get('heading') or item.get('title', 'No Title')
-                link = content.get('link') or content.get('url') or item.get('link', '#')
+                
+                # Extract link from various possible locations in yfinance structure
+                link = '#'
+                if isinstance(content.get('canonicalUrl'), dict):
+                    link = content['canonicalUrl'].get('url', '#')
+                elif isinstance(content.get('clickThroughUrl'), dict):
+                    link = content['clickThroughUrl'].get('url', '#')
+                
+                # Fallback to older structure or direct keys
+                if link == '#':
+                    link = content.get('link') or content.get('url') or item.get('link', '#')
                 
                 if title != 'No Title':
                     processed_news.append({
