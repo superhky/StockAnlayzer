@@ -123,20 +123,17 @@ if symbol:
                     if not news:
                         st.info("실시간 뉴스 데이터를 불러오는 중입니다. 잠시 후 다시 시도하거나 아래 버튼을 클릭하세요.")
                         if not resolved_ticker.endswith(('.KS', '.KQ')):
-                            yahoo_news_url = f"https://finance.yahoo.com/quote/{resolved_ticker}/news"
-                            st.link_button("🌐 Yahoo Finance에서 직접 뉴스 보기", yahoo_news_url, use_container_width=True)
+                            st.link_button("🌐 Yahoo Finance에서 직접 뉴스 보기", f"https://finance.yahoo.com/quote/{resolved_ticker}/news", use_container_width=True)
                         else:
-                            naver_news_url = f"https://finance.naver.com/item/news.naver?code={resolved_ticker.replace('.KS','').replace('.KQ','')}"
-                            st.link_button("🌐 네이버 금융에서 직접 뉴스 보기", naver_news_url, use_container_width=True)
+                            st.link_button("🌐 네이버 금융에서 직접 뉴스 보기", f"https://finance.naver.com/item/news.naver?code={resolved_ticker.replace('.KS','').replace('.KQ','')}", use_container_width=True)
                     else:
                         for item in news:
                             title = item.get('title', '뉴스 제목 없음')
                             link = item.get('link')
                             if link and link.startswith('http'):
-                                # Standard Link Button
                                 st.link_button(f"🔗 {title}", link, use_container_width=True)
-                                # Backup simple link in case button fails
-                                st.caption(f"[새 창에서 열기]({link})")
+                            else:
+                                st.write(f"📄 {title} (링크를 불러올 수 없음)")
                         
                         st.divider()
                         if not resolved_ticker.endswith(('.KS', '.KQ')):

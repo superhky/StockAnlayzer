@@ -10,6 +10,7 @@ import re
 import google.generativeai as genai
 from datetime import datetime
 import pytz
+import json
 
 class StockAnalyzer:
     def __init__(self):
@@ -83,7 +84,7 @@ class StockAnalyzer:
         return df
 
     def fetch_news(self, ticker):
-        """Fetches news with a robust recursive search for links."""
+        """Fetches news and extracts links using global regex search for maximum robustness."""
         if ticker.endswith(('.KS', '.KQ')):
             return self._fetch_naver_news(ticker)
         
@@ -96,43 +97,37 @@ class StockAnalyzer:
             
             if not raw_news: return []
 
-            def find_links(obj):
-                """Recursively searches for anything starting with http and containing yahoo.com or similar."""
-                links = []
-                if isinstance(obj, dict):
-                    for k, v in obj.items():
-                        if k in ['url', 'link', 'canonicalUrl', 'clickThroughUrl'] and isinstance(v, str) and v.startswith('http'):
-                            links.append(v)
-                        elif isinstance(v, (dict, list)):
-                            links.extend(find_links(v))
-                        elif isinstance(v, str) and v.startswith('http') and ('yahoo.com' in v or 'investors.com' in v or 'fool.com' in v):
-                            links.append(v)
-                elif isinstance(obj, list):
-                    for item in obj:
-                        links.extend(find_links(item))
-                return links
-
             processed_news = []
             for item in raw_news[:5]:
-                # 1. Title find
+                # 1. Title extraction
                 content = item.get('content', {})
                 title = item.get('title') or (content.get('title') if isinstance(content, dict) else None) or \
                         (content.get('heading') if isinstance(content, dict) else None) or '주요 뉴스'
                 
-                # 2. Aggressive Recursive link find
-                potential_links = find_links(item)
+                # 2. Aggressive Link Extraction using Regex
+                # Convert the entire item to a string and find all https links
+                item_str = json.dumps(item)
+                # Regex for URLs: starts with https, ends with common URL characters
+                links = re.findall(r'https?://[^\s<>"]+|https?://[^\s<>"]+', item_str)
                 
-                # Prioritize finance.yahoo.com links if multiple found
+                # Filter for useful links
                 final_link = None
-                if potential_links:
-                    for l in potential_links:
+                if links:
+                    for l in links:
+                        l = l.strip('\\"').strip('"') # Clean up json artifacts
                         if 'finance.yahoo.com/news' in l:
                             final_link = l
                             break
-                    if not final_link: final_link = potential_links[0]
+                    if not final_link:
+                        for l in links:
+                            l = l.strip('\\"').strip('"')
+                            if any(domain in l for domain in ['yahoo.com', 'investors.com', 'fool.com', 'bloomberg.com', 'reuters.com']):
+                                final_link = l
+                                break
+                    if not final_link:
+                        final_link = links[0].strip('\\"').strip('"')
                 
-                if final_link:
-                    processed_news.append({'title': title, 'link': final_link})
+                processed_news.append({'title': title, 'link': final_link})
             
             return processed_news
         except: return []
