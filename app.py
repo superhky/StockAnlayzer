@@ -3,12 +3,9 @@ import streamlit as st
 # Page config (MUST be the first Streamlit command)
 st.set_page_config(page_title="Pro Stock Analyzer", layout="wide", initial_sidebar_state="expanded")
 
-# Google AdSense Verification (Must be close to the top)
+# Google AdSense Verification (Auto Ads)
 st.markdown("""
-<div style="display:none; visibility:hidden;">
-    <meta name="google-adsense-account" content="ca-pub-8764053427630602">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8764053427630602" crossorigin="anonymous"></script>
-</div>
 """, unsafe_allow_html=True)
 
 import pandas as pd
@@ -49,16 +46,10 @@ st.markdown("### 한국 및 미국 주식 기술적 분석 및 AI 전략 리포�
 # Sidebar
 with st.sidebar:
     st.header("Settings")
-    # AdSense Verification String (Visible and Prominent for crawlers)
-    st.write("---")
-    st.caption("Verification ID: google.com, pub-8764053427630602, DIRECT, f08c47fec0942fa0")
-    st.write("---")
     api_key = st.text_input("Gemini API Key", type="password", help="Get your key from Google AI Studio")
     st.info("API 키가 없으면 기술 분석만 수행됩니다.")
     st.divider()
     st.markdown("Developed by Antigravity")
-    # AdSense Verification Text (Visible for crawlers)
-    st.caption("AdSense: google.com, pub-8764053427630602, DIRECT, f08c47fec0942fa0")
 
 # Main Content
 col1, col2 = st.columns([1, 1])
@@ -155,3 +146,33 @@ if symbol:
 
 else:
     st.info("종목 이름이나 티커를 입력하고 '분석 시작' 버튼을 누르세요.")
+    
+    # Information Section for AdSense (Add more text content)
+    st.divider()
+    col_info1, col_info2 = st.columns(2)
+    with col_info1:
+        st.markdown("#### 📈 주요 기능")
+        st.markdown("""
+        - **기술적 지표 분석**: RSI, MACD, 볼린저 밴드 등 핵심 지표 실시간 계산
+        - **인공지능 리포트**: Google Gemini AI를 활용한 맞춤형 투자 전략 제안
+        - **최신 뉴스 통합**: 종목별 주요 뉴스를 한눈에 확인
+        """)
+    with col_info2:
+        st.markdown("#### 💡 사용 방법")
+        st.markdown("""
+        1. 왼쪽 사이드바에 **Gemini API Key**를 입력합니다 (선택 사항).
+        2. 분석하고 싶은 **종목명 또는 티커**를 입력합니다.
+        3. '분석 시작' 버튼을 눌러 결과 보고서를 확인합니다.
+        """)
+
+# Footer & Legal (Crucial for AdSense approval)
+st.markdown("---")
+footer_col1, footer_col2, footer_col3 = st.columns([2, 1, 1])
+with footer_col1:
+    st.caption("© 2024 Pro Stock AI Analyzer. All rights reserved.")
+    st.caption("본 서비스에서 제공하는 정보는 투자 참고용이며, 투자에 대한 최종 책임은 본인에게 있습니다.")
+with footer_col2:
+    st.markdown("[개인정보 처리방침](#)")
+with footer_col3:
+    st.markdown("[이용 약관](#)")
+
