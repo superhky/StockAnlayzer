@@ -84,7 +84,7 @@ class StockAnalyzer:
         return df
 
     def fetch_news(self, ticker):
-        """Fetches news and extracts links using global regex search for maximum robustness."""
+        """Robustly fetches news and extracts links using multiple techniques."""
         if ticker.endswith(('.KS', '.KQ')):
             return self._fetch_naver_news(ticker)
         
@@ -99,38 +99,46 @@ class StockAnalyzer:
 
             processed_news = []
             for item in raw_news[:5]:
-                # 1. Title extraction
+                # 1. Title find
                 content = item.get('content', {})
                 title = item.get('title') or (content.get('title') if isinstance(content, dict) else None) or \
                         (content.get('heading') if isinstance(content, dict) else None) or '주요 뉴스'
                 
-                # 2. Aggressive Link Extraction using Regex
-                # Convert the entire item to a string and find all https links
-                item_str = json.dumps(item)
-                # Regex for URLs: starts with https, ends with common URL characters
-                links = re.findall(r'https?://[^\s<>"]+|https?://[^\s<>"]+', item_str)
+                # 2. Aggressive multi-stage link extraction
+                link = item.get('link') or item.get('url')
+                if not link and isinstance(content, dict):
+                    link = content.get('canonicalUrl', {}).get('url') or \
+                           content.get('clickThroughUrl', {}).get('url') or \
+                           content.get('previewUrl')
                 
-                # Filter for useful links
-                final_link = None
-                if links:
-                    for l in links:
-                        l = l.strip('\\"').strip('"') # Clean up json artifacts
-                        if 'finance.yahoo.com/news' in l:
-                            final_link = l
-                            break
-                    if not final_link:
+                # 3. Last resort: regex on string representation (safer than json.dumps)
+                if not link:
+                    item_str = str(item)
+                    links = re.findall(r'https?://[^\s<>"\']+', item_str)
+                    if links:
+                        # Prioritize Yahoo Finance news links
                         for l in links:
-                            l = l.strip('\\"').strip('"')
-                            if any(domain in l for domain in ['yahoo.com', 'investors.com', 'fool.com', 'bloomberg.com', 'reuters.com']):
-                                final_link = l
+                            if 'finance.yahoo.com/news' in l:
+                                link = l
                                 break
-                    if not final_link:
-                        final_link = links[0].strip('\\"').strip('"')
+                        if not link: link = links[0]
                 
-                processed_news.append({'title': title, 'link': final_link})
+                # Clean up the link
+                if link:
+                    link = link.strip('\\"').strip("'").strip('"')
+                    if link.startswith('/'): link = f"https://finance.yahoo.com{link}"
+                    elif link.startswith('m/'): link = f"https://finance.yahoo.com/{link}"
+                    
+                    if link.startswith('http'):
+                        processed_news.append({'title': title, 'link': link})
+                else:
+                    # Even if no link, keep title for AI analysis
+                    processed_news.append({'title': title, 'link': None})
             
             return processed_news
-        except: return []
+        except Exception as e:
+            print(f"Fetch news error: {e}")
+            return []
 
     def _fetch_naver_price(self, ticker):
         try:
