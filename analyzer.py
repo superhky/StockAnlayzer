@@ -84,61 +84,59 @@ class StockAnalyzer:
         return df
 
     def fetch_news(self, ticker):
-        """Robustly fetches news and extracts links using multiple techniques."""
+        """Google News RSS (Financial Filter)를 사용하여 미국 주식 뉴스를 가장 안정적으로 가져옵니다."""
         if ticker.endswith(('.KS', '.KQ')):
             return self._fetch_naver_news(ticker)
         
         try:
-            stock = yf.Ticker(ticker)
-            raw_news = stock.news
-            if not raw_news:
-                search = yf.Search(ticker, max_results=5)
-                raw_news = search.news
+            # Google News RSS with stock filter
+            # Using 'ticker:SYMBOL' or 'SYMBOL stock' provides curated financial news
+            clean_ticker = ticker.split('.')[0]
+            search_query = f"stock:{clean_ticker}"
+            url = f"https://news.google.com/rss/search?q={search_query}&hl=en-US&gl=US&ceid=US:en"
             
-            if not raw_news: return []
-
+            headers = {'User-Agent': 'Mozilla/5.0'}
+            res = requests.get(url, headers=headers)
+            # Use 'html.parser' as fallback for better compatibility
+            soup = BeautifulSoup(res.text, 'html.parser')
+            
+            items = soup.find_all('item')
             processed_news = []
-            for item in raw_news[:5]:
-                # 1. Title find
-                content = item.get('content', {})
-                title = item.get('title') or (content.get('title') if isinstance(content, dict) else None) or \
-                        (content.get('heading') if isinstance(content, dict) else None) or '주요 뉴스'
-                
-                # 2. Aggressive multi-stage link extraction
-                link = item.get('link') or item.get('url')
-                if not link and isinstance(content, dict):
-                    link = content.get('canonicalUrl', {}).get('url') or \
-                           content.get('clickThroughUrl', {}).get('url') or \
-                           content.get('previewUrl')
-                
-                # 3. Last resort: regex on string representation (safer than json.dumps)
-                if not link:
-                    item_str = str(item)
-                    links = re.findall(r'https?://[^\s<>"\']+', item_str)
-                    if links:
-                        # Prioritize Yahoo Finance news links
-                        for l in links:
-                            if 'finance.yahoo.com/news' in l:
-                                link = l
-                                break
-                        if not link: link = links[0]
-                
-                # Clean up the link
-                if link:
-                    link = link.strip('\\"').strip("'").strip('"')
-                    if link.startswith('/'): link = f"https://finance.yahoo.com{link}"
-                    elif link.startswith('m/'): link = f"https://finance.yahoo.com/{link}"
-                    
-                    if link.startswith('http'):
-                        processed_news.append({'title': title, 'link': link})
-                else:
-                    # Even if no link, keep title for AI analysis
-                    processed_news.append({'title': title, 'link': None})
             
+            for item in items[:5]:
+                # In RSS/XML, tags are case-insensitive or specific in BeautifulSoup
+                title_tag = item.find('title')
+                link_tag = item.find('link')
+                
+                title = title_tag.text if title_tag else '주요 뉴스'
+                link = link_tag.text if link_tag else None
+                
+                if title and link:
+                    processed_news.append({'title': title, 'link': link})
+            
+            # Fallback if Google News is empty
+            if not processed_news:
+                return self._fetch_yfinance_news_fallback(ticker)
+                
             return processed_news
         except Exception as e:
-            print(f"Fetch news error: {e}")
-            return []
+            print(f"Google News error: {e}")
+            return self._fetch_yfinance_news_fallback(ticker)
+
+    def _fetch_yfinance_news_fallback(self, ticker):
+        """Backup news source using yfinance with direct link extraction."""
+        try:
+            stock = yf.Ticker(ticker)
+            raw_news = stock.news
+            processed_news = []
+            for item in (raw_news or [])[:5]:
+                content = item.get('content', {})
+                title = item.get('title') or content.get('title') or '주요 뉴스'
+                link = item.get('link') or item.get('url') or content.get('canonicalUrl', {}).get('url')
+                if title:
+                    processed_news.append({'title': title, 'link': link})
+            return processed_news
+        except: return []
 
     def _fetch_naver_price(self, ticker):
         try:
@@ -180,3 +178,7 @@ class StockAnalyzer:
             prompt = f"Analyze {ticker}. Price: {price_info}, Technicals: {technicals}, News: {news}. Context: {avg_purchase_price}. Respond in Korean."
             return model.generate_content(prompt).text
         except Exception as e: return str(e)
+
+if __name__ == "__main__":
+    analyzer = StockAnalyzer()
+    print(analyzer.fetch_news("AAPL"))

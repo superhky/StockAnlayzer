@@ -131,18 +131,16 @@ if symbol:
                             title = item.get('title', '뉴스 제목 없음')
                             link = item.get('link')
                             if link and str(link).startswith('http'):
-                                # Streamlit's link_button opens in a new tab by default
                                 st.link_button(f"🔗 {title}", link, use_container_width=True)
                             else:
-                                # Show title even if link is missing
                                 st.write(f"📄 {title} (링크를 불러올 수 없음)")
                         
-                        # Footer link for direct source
+                        # Source attribution
                         st.divider()
                         if not resolved_ticker.endswith(('.KS', '.KQ')):
-                            st.caption(f"제공: [Yahoo Finance](https://finance.yahoo.com/quote/{resolved_ticker}/news)")
+                            st.caption(f"제공: Google News")
                         else:
-                            st.caption(f"제공: [네이버 금융](https://finance.naver.com/item/news.naver?code={resolved_ticker.replace('.KS','').replace('.KQ','')})")
+                            st.caption(f"제공: 네이버 금융")
                 
                 # 4. AI Analysis
                 if api_key:
