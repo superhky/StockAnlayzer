@@ -133,7 +133,8 @@ if symbol:
                             if link and str(link).startswith('http'):
                                 st.link_button(f"🔗 {title}", link, use_container_width=True)
                             else:
-                                st.write(f"📄 {title} (링크를 불러올 수 없음)")
+                                # Show title only, without 'link not available' message
+                                st.write(f"📄 {title}")
                         
                         # Source attribution
                         st.divider()
