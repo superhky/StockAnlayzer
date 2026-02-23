@@ -83,9 +83,10 @@ class StockAnalyzer:
         return df
 
     def fetch_news(self, ticker):
-        """Fetches latest news and tries aggressively to find a valid URL."""
+        """Fetches news with a robust recursive search for links."""
         if ticker.endswith(('.KS', '.KQ')):
             return self._fetch_naver_news(ticker)
+        
         try:
             stock = yf.Ticker(ticker)
             raw_news = stock.news
@@ -93,32 +94,45 @@ class StockAnalyzer:
                 search = yf.Search(ticker, max_results=5)
                 raw_news = search.news
             
+            if not raw_news: return []
+
+            def find_links(obj):
+                """Recursively searches for anything starting with http and containing yahoo.com or similar."""
+                links = []
+                if isinstance(obj, dict):
+                    for k, v in obj.items():
+                        if k in ['url', 'link', 'canonicalUrl', 'clickThroughUrl'] and isinstance(v, str) and v.startswith('http'):
+                            links.append(v)
+                        elif isinstance(v, (dict, list)):
+                            links.extend(find_links(v))
+                        elif isinstance(v, str) and v.startswith('http') and ('yahoo.com' in v or 'investors.com' in v or 'fool.com' in v):
+                            links.append(v)
+                elif isinstance(obj, list):
+                    for item in obj:
+                        links.extend(find_links(item))
+                return links
+
             processed_news = []
             for item in raw_news[:5]:
-                # Aggressive link finding
-                link = None
-                
-                # Check directly in the item
-                link = item.get('link') or item.get('url')
-                
-                # Check in content object
+                # 1. Title find
                 content = item.get('content', {})
-                if not link and isinstance(content, dict):
-                    link = content.get('canonicalUrl', {}).get('url') or \
-                           content.get('clickThroughUrl', {}).get('url') or \
-                           content.get('previewUrl') or \
-                           content.get('link') or content.get('url')
+                title = item.get('title') or (content.get('title') if isinstance(content, dict) else None) or \
+                        (content.get('heading') if isinstance(content, dict) else None) or '주요 뉴스'
                 
-                # Use title as fallback if title is missing
-                title = item.get('title') or content.get('title') or content.get('heading') or '뉴스 제목 없음'
+                # 2. Aggressive Recursive link find
+                potential_links = find_links(item)
                 
-                # Final URL validation and formatting
-                if link:
-                    if link.startswith('/'): link = f"https://finance.yahoo.com{link}"
-                    elif link.startswith('m/'): link = f"https://finance.yahoo.com/{link}"
-                    
-                    if link.startswith('http'):
-                        processed_news.append({'title': title, 'link': link})
+                # Prioritize finance.yahoo.com links if multiple found
+                final_link = None
+                if potential_links:
+                    for l in potential_links:
+                        if 'finance.yahoo.com/news' in l:
+                            final_link = l
+                            break
+                    if not final_link: final_link = potential_links[0]
+                
+                if final_link:
+                    processed_news.append({'title': title, 'link': final_link})
             
             return processed_news
         except: return []
