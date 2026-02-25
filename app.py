@@ -121,31 +121,31 @@ if symbol:
                     fig_macd.update_layout(title="MACD", template="plotly_dark", height=300, margin=dict(l=20, r=20, t=40, b=20))
                     st.plotly_chart(fig_macd, use_container_width=True)
                 
-                    if news:
-                        # Display news in a robust, clickable, and AdSense-compliant layout
-                        st.markdown('<p style="font-size: 0.8em; color: gray;">※ 제목을 클릭하거나 우측 버튼을 눌러 전체 기사를 확인하세요.</p>', unsafe_allow_html=True)
-                        for i, item in enumerate(news):
-                            title = item.get('title', '주요 뉴스')
-                            link = item.get('link')
-                            if link:
-                                # Using columns to separate title (content) and button (action)
-                                # This is highly reliable in deployed environments and AdSense-safe.
-                                n_col1, n_col2 = st.columns([0.8, 0.2])
-                                with n_col1:
-                                    st.markdown(f"**{i+1}. {title}**")
-                                with n_col2:
-                                    st.link_button("기사 보기", link, use_container_width=True)
-                            else:
-                                st.write(f"• {title}")
-                        
-                        # Source attribution
-                        st.divider()
-                        if not resolved_ticker.endswith(('.KS', '.KQ')):
-                            st.caption("제공: Yahoo Finance / Google News")
+                # 4. Latest News Section
+                if news:
+                    st.divider()
+                    st.subheader("📰 최신 주요 뉴스")
+                    st.markdown('<p style="font-size: 0.8em; color: gray;">※ 제목을 클릭하거나 우측 버튼을 눌러 전체 기사를 확인하세요.</p>', unsafe_allow_html=True)
+                    for i, item in enumerate(news):
+                        title = item.get('title', '주요 뉴스')
+                        link = item.get('link')
+                        if link:
+                            # Using columns to separate title (content) and button (action)
+                            n_col1, n_col2 = st.columns([0.8, 0.2])
+                            with n_col1:
+                                st.markdown(f"**{i+1}. {title}**")
+                            with n_col2:
+                                st.link_button("기사 보기", link, use_container_width=True)
                         else:
-                            st.caption("제공: 네이버 금융")
+                            st.write(f"• {title}")
+                    
+                    # Source attribution
+                    if not resolved_ticker.endswith(('.KS', '.KQ')):
+                        st.caption("제공: Yahoo Finance / Google News")
+                    else:
+                        st.caption("제공: 네이버 금융")
                 
-                # 4. AI Analysis
+                # 5. AI Analysis
                 if api_key:
                     price_info = f"Latest Close: {latest['Close']:.2f}, Volume: {latest['Volume']}"
                     technicals = f"RSI: {latest['RSI']:.2f}, MACD: {latest['MACD']:.2f}, BB High: {latest['BB_High']:.2f}, BB Low: {latest['BB_Low']:.2f}"

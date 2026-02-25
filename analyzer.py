@@ -163,7 +163,10 @@ class StockAnalyzer:
     def _fetch_naver_news(self, ticker):
         code = ticker.replace('.KS', '').replace('.KQ', '')
         url = f"https://finance.naver.com/item/news_news.naver?code={code}&page=1"
-        headers = {'User-Agent': 'Mozilla/5.0'}
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Referer': f'https://finance.naver.com/item/news.naver?code={code}'
+        }
         try:
             res = requests.get(url, headers=headers)
             res.encoding = 'euc-kr'
