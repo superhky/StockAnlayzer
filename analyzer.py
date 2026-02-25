@@ -212,12 +212,12 @@ class StockAnalyzer:
             return news_items
         except: return []
 
-    def generate_ai_analysis(self, ticker, price_info, technicals, news, api_key, avg_purchase_price=None):
+    def generate_ai_analysis(self, ticker, price_info, technicals, news, api_key, avg_purchase_price=None, language='Korean'):
         if not api_key: return "API Key is required."
         try:
             genai.configure(api_key=api_key)
             model = genai.GenerativeModel('gemini-1.5-flash')
-            prompt = f"Analyze {ticker}. Price: {price_info}, Technicals: {technicals}, News: {news}. Context: {avg_purchase_price}. Respond in Korean."
+            prompt = f"Analyze {ticker}. Price: {price_info}, Technicals: {technicals}, News: {news}. Context: {avg_purchase_price}. Respond in {language}."
             return model.generate_content(prompt).text
         except Exception as e: return str(e)
 
