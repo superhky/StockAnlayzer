@@ -36,14 +36,20 @@ class StockAnalyzer:
         if api_key and len(name) > 1:
             try:
                 genai.configure(api_key=api_key)
-                try:
-                    model = genai.GenerativeModel('gemini-1.5-flash')
-                except:
-                    model = genai.GenerativeModel('gemini-pro')
                 prompt = f"Find the stock ticker for company '{name}'. Respond ONLY with the ticker symbol (e.g. 005930.KS or AAPL)."
-                response = model.generate_content(prompt)
-                ticker = response.text.strip()
-                if ticker and len(ticker) <= 10: return ticker
+                
+                # Try models in order of preference
+                for model_name in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']:
+                    try:
+                        model = genai.GenerativeModel(model_name)
+                        response = model.generate_content(prompt)
+                        ticker = response.text.strip()
+                        if ticker and len(ticker) <= 15: return ticker
+                        break
+                    except Exception as e:
+                        if "404" in str(e) or "not found" in str(e).lower():
+                            continue
+                        break
             except: pass
         return name
 
@@ -219,18 +225,22 @@ class StockAnalyzer:
         if not api_key: return "API Key is required."
         try:
             genai.configure(api_key=api_key)
-            # Try 1.5-flash first (standard for Google AI Studio)
-            try:
-                model = genai.GenerativeModel('gemini-1.5-flash')
-            except:
-                # Fallback to older gemini-pro if 1.5-flash is not available in the region
-                model = genai.GenerativeModel('gemini-pro')
-                
             prompt = f"Analyze {ticker}. Price: {price_info}, Technicals: {technicals}, News: {news}. Context: {avg_purchase_price}. Respond in {language}."
-            return model.generate_content(prompt).text
+            
+            # Try models in order of preference
+            for model_name in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']:
+                try:
+                    model = genai.GenerativeModel(model_name)
+                    response = model.generate_content(prompt)
+                    return response.text
+                except Exception as e:
+                    if "404" in str(e) or "not found" in str(e).lower():
+                        continue # Try next model
+                    return f"AI Generation Error ({model_name}): {str(e)}"
+            
+            return "AI Analysis Error: No compatible Gemini models found for this API key."
         except Exception as e:
-            # Final fallback message
-            return f"AI Analysis Error: {str(e)}"
+            return f"AI Config Error: {str(e)}"
 
 if __name__ == "__main__":
     analyzer = StockAnalyzer()
