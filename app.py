@@ -1,5 +1,6 @@
 import streamlit as st
 
+# Updated to fix news display issue (Feb 25, 2026)
 # Page config (MUST be the first Streamlit command)
 st.set_page_config(page_title="Pro Stock Analyzer", layout="wide", initial_sidebar_state="expanded")
 
