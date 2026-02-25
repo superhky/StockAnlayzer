@@ -131,9 +131,8 @@ if symbol:
                             title = item.get('title', '뉴스 제목 없음')
                             link = item.get('link')
                             if link and str(link).startswith('http'):
-                                # Use markdown list with links instead of large buttons
-                                # This avoids 'Navigation' policy violations by making it clear it's content, not a menu.
-                                st.markdown(f"• [{title}]({link})")
+                                # Use HTML for guaranteed clickability with complex URLs
+                                st.markdown(f'• <a href="{link}" target="_blank" style="text-decoration: none; color: #4dabf7;">{title}</a>', unsafe_allow_html=True)
                             else:
                                 st.write(f"• {title}")
                         
