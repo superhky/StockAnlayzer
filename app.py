@@ -71,7 +71,9 @@ if symbol:
         # Show a resolving message if it's likely a name
         with st.spinner(f"'{symbol}' 분석 중..."):
             resolved_ticker = analyzer.get_ticker(symbol, api_key=api_key)
+            company_name = analyzer.get_company_name(resolved_ticker)
             st.session_state['resolved_ticker'] = resolved_ticker
+            st.session_state['company_name'] = company_name
             
             # 1. Fetch Data
             df, error = analyzer.fetch_data(resolved_ticker)
@@ -83,6 +85,9 @@ if symbol:
                 df = analyzer.calculate_indicators(df)
                 latest = df.iloc[-1]
                 news = analyzer.fetch_news(resolved_ticker)
+                
+                # Header with Company Name
+                st.subheader(f"📈 {company_name} ({resolved_ticker})")
                 
                 # Metrics Display
                 st.divider()
@@ -99,7 +104,7 @@ if symbol:
                 fig_price.add_trace(go.Scatter(x=df.index, y=df['BB_High'], name='BB Upper', line=dict(color='rgba(255, 165, 0, 0.6)', width=1, dash='dot')))
                 fig_price.add_trace(go.Scatter(x=df.index, y=df['BB_Low'], name='BB Lower', line=dict(color='rgba(255, 165, 0, 0.6)', width=1, dash='dot')))
                 fig_price.add_trace(go.Scatter(x=df.index, y=df['BB_Mid'], name='BB Mid', line=dict(color='rgba(255, 255, 255, 0.3)', width=1)))
-                fig_price.update_layout(title=f"{resolved_ticker} Price & Bollinger Bands", template="plotly_dark", height=400, margin=dict(l=20, r=20, t=40, b=20))
+                fig_price.update_layout(title=f"{company_name} ({resolved_ticker}) Price & Bollinger Bands", template="plotly_dark", height=400, margin=dict(l=20, r=20, t=40, b=20))
                 st.plotly_chart(fig_price, use_container_width=True)
 
                 c_col1, c_col2 = st.columns(2)

@@ -44,6 +44,28 @@ class StockAnalyzer:
             except: pass
         return name
 
+    def get_company_name(self, ticker):
+        """Returns the company name for a given ticker."""
+        if ticker.endswith(('.KS', '.KQ')):
+            try:
+                code = ticker.replace('.KS', '').replace('.KQ', '')
+                url = f"https://finance.naver.com/item/main.naver?code={code}"
+                res = requests.get(url)
+                soup = BeautifulSoup(res.text, 'html.parser')
+                # Naver Finance has the company name in the 'wrap_company' div or meta tags
+                name_tag = soup.select_one('.wrap_company h2 a')
+                if name_tag:
+                    return name_tag.get_text(strip=True)
+            except: pass
+        
+        try:
+            stock = yf.Ticker(ticker)
+            # Try to get shortName or longName from yfinance
+            info = stock.info
+            return info.get('shortName') or info.get('longName') or ticker
+        except:
+            return ticker
+
     def fetch_data(self, ticker, period="1y"):
         """Fetches historical price data using yfinance, patched with Naver for KR stocks."""
         try:
