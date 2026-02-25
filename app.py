@@ -81,6 +81,7 @@ if symbol:
                 # 2. Indicators
                 df = analyzer.calculate_indicators(df)
                 latest = df.iloc[-1]
+                news = analyzer.fetch_news(resolved_ticker)
                 
                 # Metrics Display
                 st.divider()
@@ -120,7 +121,7 @@ if symbol:
                     fig_macd.update_layout(title="MACD", template="plotly_dark", height=300, margin=dict(l=20, r=20, t=40, b=20))
                     st.plotly_chart(fig_macd, use_container_width=True)
                 
-                    else:
+                    if news:
                         # Display news in a robust, clickable, and AdSense-compliant layout
                         st.markdown('<p style="font-size: 0.8em; color: gray;">※ 제목을 클릭하거나 우측 버튼을 눌러 전체 기사를 확인하세요.</p>', unsafe_allow_html=True)
                         for i, item in enumerate(news):
