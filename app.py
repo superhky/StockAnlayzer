@@ -19,12 +19,15 @@ st.markdown("""
         background-color: #0e1117;
     }
     .stButton>button {
-        width: 100%;
         border-radius: 5px;
-        height: 3em;
-        background-color: #007bff;
+        height: 2.5em;
+        background-color: #262730;
         color: white;
-        font-weight: bold;
+        border: 1px solid #4dabf7;
+    }
+    .stButton>button:hover {
+        background-color: #4dabf7;
+        color: white;
     }
     .stTextInput>div>div>input {
         background-color: #262730;
@@ -117,23 +120,20 @@ if symbol:
                     fig_macd.update_layout(title="MACD", template="plotly_dark", height=300, margin=dict(l=20, r=20, t=40, b=20))
                     st.plotly_chart(fig_macd, use_container_width=True)
                 
-                # 3. News
-                news = analyzer.fetch_news(resolved_ticker)
-                with st.expander("최신 관련 뉴스", expanded=True):
-                    if not news:
-                        st.info("실시간 뉴스 데이터를 불러오는 중입니다. 잠시 후 다시 시도하거나 아래 버튼을 클릭하세요.")
-                        if not resolved_ticker.endswith(('.KS', '.KQ')):
-                            st.link_button("🌐 Yahoo Finance에서 직접 뉴스 보기", f"https://finance.yahoo.com/quote/{resolved_ticker}/news", use_container_width=True)
-                        else:
-                            st.link_button("🌐 네이버 금융에서 직접 뉴스 보기", f"https://finance.naver.com/item/news.naver?code={resolved_ticker.replace('.KS','').replace('.KQ','')}", use_container_width=True)
                     else:
-                        # Display news as a simple, clickable list
-                        # This format is AdSense-friendly (content, not navigation) and reliable.
-                        for item in news:
+                        # Display news in a robust, clickable, and AdSense-compliant layout
+                        st.markdown('<p style="font-size: 0.8em; color: gray;">※ 제목을 클릭하거나 우측 버튼을 눌러 전체 기사를 확인하세요.</p>', unsafe_allow_html=True)
+                        for i, item in enumerate(news):
                             title = item.get('title', '주요 뉴스')
                             link = item.get('link')
                             if link:
-                                st.markdown(f"• [{title}]({link})")
+                                # Using columns to separate title (content) and button (action)
+                                # This is highly reliable in deployed environments and AdSense-safe.
+                                n_col1, n_col2 = st.columns([0.8, 0.2])
+                                with n_col1:
+                                    st.markdown(f"**{i+1}. {title}**")
+                                with n_col2:
+                                    st.link_button("기사 보기", link, use_container_width=True)
                             else:
                                 st.write(f"• {title}")
                         
