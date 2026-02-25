@@ -38,18 +38,16 @@ class StockAnalyzer:
                 genai.configure(api_key=api_key)
                 prompt = f"Find the stock ticker for company '{name}'. Respond ONLY with the ticker symbol (e.g. 005930.KS or AAPL)."
                 
-                # Try models in order of preference
-                for model_name in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']:
+                # Broad model list for maximum compatibility
+                for model_name in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro', 'gemini-1.0-pro']:
                     try:
                         model = genai.GenerativeModel(model_name)
                         response = model.generate_content(prompt)
                         ticker = response.text.strip()
                         if ticker and len(ticker) <= 15: return ticker
                         break
-                    except Exception as e:
-                        if "404" in str(e) or "not found" in str(e).lower():
-                            continue
-                        break
+                    except:
+                        continue
             except: pass
         return name
 
@@ -227,18 +225,20 @@ class StockAnalyzer:
             genai.configure(api_key=api_key)
             prompt = f"Analyze {ticker}. Price: {price_info}, Technicals: {technicals}, News: {news}. Context: {avg_purchase_price}. Respond in {language}."
             
-            # Try models in order of preference
-            for model_name in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']:
+            # Expanded model list for maximum compatibility
+            for model_name in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro', 'gemini-1.0-pro']:
                 try:
                     model = genai.GenerativeModel(model_name)
                     response = model.generate_content(prompt)
                     return response.text
                 except Exception as e:
-                    if "404" in str(e) or "not found" in str(e).lower():
-                        continue # Try next model
+                    # Log error details but continue if it's likely a model availability issue
+                    err_msg = str(e).lower()
+                    if "404" in err_msg or "not found" in err_msg or "not supported" in err_msg:
+                        continue 
                     return f"AI Generation Error ({model_name}): {str(e)}"
             
-            return "AI Analysis Error: No compatible Gemini models found for this API key."
+            return "AI Analysis Error: No compatible Gemini models found for this API key. Please check if your key is active and has access to Gemini models at Google AI Studio."
         except Exception as e:
             return f"AI Config Error: {str(e)}"
 
