@@ -93,13 +93,24 @@ class StockAnalyzer:
             stock = yf.Ticker(ticker)
             raw_news = stock.news
             processed_news = []
-            for item in (raw_news or [])[:5]:
-                # yfinance returns direct links which are more stable for clicking
-                title = item.get('title')
-                link = item.get('link')
+            for item in (raw_news or []):
+                # Handle different yfinance news structures
+                content = item.get('content', {})
+                title = item.get('title') or content.get('title')
+                
+                # Try multiple possible link locations
+                link = item.get('link') or item.get('url')
+                if not link:
+                    link = content.get('canonicalUrl', {}).get('url')
+                if not link:
+                    link = content.get('clickThroughUrl', {}).get('url')
+                
                 if title and link:
                     title = title.replace('[', '(').replace(']', ')').strip()
                     processed_news.append({'title': title, 'link': link})
+                
+                if len(processed_news) >= 5:
+                    break
             
             if processed_news:
                 return processed_news
