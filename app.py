@@ -131,8 +131,17 @@ if symbol:
                             title = item.get('title', '뉴스 제목 없음')
                             link = item.get('link')
                             if link and str(link).startswith('http'):
-                                # Use HTML for guaranteed clickability with complex URLs
-                                st.markdown(f'• <a href="{link}" target="_blank" style="text-decoration: none; color: #4dabf7;">{title}</a>', unsafe_allow_html=True)
+                                # Enhanced HTML with explicit styling for clickability and pointer events
+                                link_html = f'''
+                                <div style="margin-bottom: 8px;">
+                                    <span style="color: #4dabf7;">•</span>
+                                    <a href="{link}" target="_blank" 
+                                       style="color: #4dabf7; text-decoration: none; font-weight: 500; cursor: pointer !important; position: relative; z-index: 1000;">
+                                        {title}
+                                    </a>
+                                </div>
+                                '''
+                                st.markdown(link_html, unsafe_allow_html=True)
                             else:
                                 st.write(f"• {title}")
                         
