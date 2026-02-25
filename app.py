@@ -131,15 +131,16 @@ if symbol:
                             title = item.get('title', '뉴스 제목 없음')
                             link = item.get('link')
                             if link and str(link).startswith('http'):
-                                st.link_button(f"🔗 {title}", link, use_container_width=True)
+                                # Use markdown list with links instead of large buttons
+                                # This avoids 'Navigation' policy violations by making it clear it's content, not a menu.
+                                st.markdown(f"• [{title}]({link})")
                             else:
-                                # Show title only, without 'link not available' message
-                                st.write(f"📄 {title}")
+                                st.write(f"• {title}")
                         
                         # Source attribution
                         st.divider()
                         if not resolved_ticker.endswith(('.KS', '.KQ')):
-                            st.caption(f"제공: Google News")
+                            st.caption(f"제공: Google News & Yahoo Finance")
                         else:
                             st.caption(f"제공: 네이버 금융")
                 

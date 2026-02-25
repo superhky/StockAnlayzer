@@ -89,29 +89,28 @@ class StockAnalyzer:
             return self._fetch_naver_news(ticker)
         
         try:
-            # Google News RSS with stock filter
-            # Using 'ticker:SYMBOL' or 'SYMBOL stock' provides curated financial news
+            # Google News RSS with a more robust search query
             clean_ticker = ticker.split('.')[0]
-            search_query = f"stock:{clean_ticker}"
+            search_query = f"{clean_ticker} stock"
             url = f"https://news.google.com/rss/search?q={search_query}&hl=en-US&gl=US&ceid=US:en"
             
-            headers = {'User-Agent': 'Mozilla/5.0'}
-            res = requests.get(url, headers=headers)
-            # Use 'html.parser' as fallback for better compatibility
-            soup = BeautifulSoup(res.text, 'html.parser')
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+            res = requests.get(url, headers=headers, timeout=10)
             
+            # Use res.content instead of res.text to let BeautifulSoup handle encoding detection
+            soup = BeautifulSoup(res.content, 'xml')
             items = soup.find_all('item')
             processed_news = []
             
             for item in items[:5]:
-                # In RSS/XML, tags are case-insensitive or specific in BeautifulSoup
-                title_tag = item.find('title')
-                link_tag = item.find('link')
-                
-                title = title_tag.text if title_tag else '주요 뉴스'
-                link = link_tag.text if link_tag else None
+                title = item.title.text if item.title else '주요 뉴스'
+                link = item.link.text if item.link else None
                 
                 if title and link:
+                    # Clean up common encoding issues, curly quotes, and double spaces
+                    title = title.replace('\xa0', ' ').replace('', "'").strip()
+                    # More thorough cleanup for Windows-1252/UTF-8 mismatches
+                    title = title.replace('\u2019', "'").replace('\u2018', "'").replace('\u201c', '"').replace('\u201d', '"')
                     processed_news.append({'title': title, 'link': link})
             
             # Fallback if Google News is empty
