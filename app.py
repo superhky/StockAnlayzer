@@ -144,6 +144,8 @@ if symbol:
                     if not resolved_ticker.endswith(('.KS', '.KQ')):
                         st.caption("제공: Yahoo Finance / Google News")
                     else:
+                        code = resolved_ticker.replace('.KS', '').replace('.KQ', '')
+                        st.markdown(f"[🔗 네이버 금융에서 전체 뉴스 보기](https://finance.naver.com/item/news.naver?code={code})")
                         st.caption("제공: 네이버 금융")
                 
                 # 5. AI Analysis
