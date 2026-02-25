@@ -127,12 +127,12 @@ if symbol:
                         else:
                             st.link_button("🌐 네이버 금융에서 직접 뉴스 보기", f"https://finance.naver.com/item/news.naver?code={resolved_ticker.replace('.KS','').replace('.KQ','')}", use_container_width=True)
                     else:
+                        # Display news as a simple, clickable list
+                        # This format is AdSense-friendly (content, not navigation) and reliable.
                         for item in news:
-                            title = item.get('title', '뉴스 제목 없음')
+                            title = item.get('title', '주요 뉴스')
                             link = item.get('link')
-                            if link and str(link).startswith('http'):
-                                # Standard markdown is most reliable for clickability in Streamlit.
-                                # AdSense considers this "content" rather than a "navigation menu".
+                            if link:
                                 st.markdown(f"• [{title}]({link})")
                             else:
                                 st.write(f"• {title}")
@@ -140,9 +140,9 @@ if symbol:
                         # Source attribution
                         st.divider()
                         if not resolved_ticker.endswith(('.KS', '.KQ')):
-                            st.caption(f"제공: Google News & Yahoo Finance")
+                            st.caption("제공: Yahoo Finance / Google News")
                         else:
-                            st.caption(f"제공: 네이버 금융")
+                            st.caption("제공: 네이버 금융")
                 
                 # 4. AI Analysis
                 if api_key:

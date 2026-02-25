@@ -84,20 +84,36 @@ class StockAnalyzer:
         return df
 
     def fetch_news(self, ticker):
-        """Google News RSS (Financial Filter)를 사용하여 미국 주식 뉴스를 가장 안정적으로 가져옵니다."""
+        """미국 주식 뉴스는 직접 링크를 제공하는 Yahoo Finance를 우선 사용하고, 한국 주식은 네이버를 사용합니다."""
         if ticker.endswith(('.KS', '.KQ')):
             return self._fetch_naver_news(ticker)
         
+        # 1. Yahoo Finance (Primary for US - Direct links)
         try:
-            # Google News RSS with a more robust search query
+            stock = yf.Ticker(ticker)
+            raw_news = stock.news
+            processed_news = []
+            for item in (raw_news or [])[:5]:
+                # yfinance returns direct links which are more stable for clicking
+                title = item.get('title')
+                link = item.get('link')
+                if title and link:
+                    title = title.replace('[', '(').replace(']', ')').strip()
+                    processed_news.append({'title': title, 'link': link})
+            
+            if processed_news:
+                return processed_news
+        except Exception as e:
+            print(f"Yahoo Finance news error: {e}")
+
+        # 2. Google News RSS (Fallback)
+        try:
             clean_ticker = ticker.split('.')[0]
             search_query = f"{clean_ticker} stock"
             url = f"https://news.google.com/rss/search?q={search_query}&hl=en-US&gl=US&ceid=US:en"
             
-            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+            headers = {'User-Agent': 'Mozilla/5.0'}
             res = requests.get(url, headers=headers, timeout=10)
-            
-            # Use res.content instead of res.text to let BeautifulSoup handle encoding detection
             soup = BeautifulSoup(res.content, 'xml')
             items = soup.find_all('item')
             processed_news = []
@@ -105,25 +121,13 @@ class StockAnalyzer:
             for item in items[:5]:
                 title = item.title.text if item.title else '주요 뉴스'
                 link = item.link.text if item.link else None
-                
                 if title and link:
-                    # Clean up title for markdown compatibility
-                    title = title.replace('[', '(').replace(']', ')').replace('\xa0', ' ').strip()
-                    # More thorough cleanup for Windows-1252/UTF-8 mismatches
-                    title = title.replace('\u2019', "'").replace('\u2018', "'").replace('\u201c', '"').replace('\u201d', '"')
-                    
-                    # Ensure link is a clean string
-                    link = str(link).strip()
+                    title = title.replace('[', '(').replace(']', ')').strip()
                     processed_news.append({'title': title, 'link': link})
-            
-            # Fallback if Google News is empty
-            if not processed_news:
-                return self._fetch_yfinance_news_fallback(ticker)
-                
             return processed_news
         except Exception as e:
             print(f"Google News error: {e}")
-            return self._fetch_yfinance_news_fallback(ticker)
+            return []
 
     def _fetch_yfinance_news_fallback(self, ticker):
         """Backup news source using yfinance with direct link extraction."""
