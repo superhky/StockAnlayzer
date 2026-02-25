@@ -38,8 +38,18 @@ class StockAnalyzer:
                 genai.configure(api_key=api_key)
                 prompt = f"Find the stock ticker for company '{name}'. Respond ONLY with the ticker symbol (e.g. 005930.KS or AAPL)."
                 
-                # Broad model list for maximum compatibility
-                for model_name in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro', 'gemini-1.0-pro']:
+                # Intelligent model discovery
+                try:
+                    available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+                except:
+                    available_models = ['models/gemini-1.5-flash', 'models/gemini-pro']
+                
+                # Try discovery-based models first, prioritizing flash
+                priority_list = [am for am in available_models if '1.5-flash' in am] + \
+                                [am for am in available_models if 'pro' in am] + \
+                                available_models
+                
+                for model_name in priority_list:
                     try:
                         model = genai.GenerativeModel(model_name)
                         response = model.generate_content(prompt)
@@ -225,20 +235,43 @@ class StockAnalyzer:
             genai.configure(api_key=api_key)
             prompt = f"Analyze {ticker}. Price: {price_info}, Technicals: {technicals}, News: {news}. Context: {avg_purchase_price}. Respond in {language}."
             
-            # Expanded model list for maximum compatibility
-            for model_name in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro', 'gemini-1.0-pro']:
+            # 1. Try to discover available models for this specific API key
+            available_models = []
+            try:
+                for m in genai.list_models():
+                    if 'generateContent' in m.supported_generation_methods:
+                        available_models.append(m.name)
+            except Exception as list_err:
+                # If listing fails, fall back to a safer hardcoded list
+                available_models = ['models/gemini-1.5-flash', 'models/gemini-1.5-pro', 'models/gemini-pro']
+            
+            # 2. Prioritize best models
+            # We look for 1.5-flash, then 1.5-pro, then any gemini model
+            priority_list = []
+            for target in ['1.5-flash', '1.5-pro', 'gemini-pro', '1.0-pro']:
+                for am in available_models:
+                    if target in am:
+                        priority_list.append(am)
+                        break
+            
+            # Add remaining models just in case
+            for am in available_models:
+                if am not in priority_list:
+                    priority_list.append(am)
+
+            # 3. Try to generate content with the best available model
+            last_error = "No models found"
+            for model_name in priority_list:
                 try:
                     model = genai.GenerativeModel(model_name)
                     response = model.generate_content(prompt)
-                    return response.text
+                    if response and response.text:
+                        return response.text
                 except Exception as e:
-                    # Log error details but continue if it's likely a model availability issue
-                    err_msg = str(e).lower()
-                    if "404" in err_msg or "not found" in err_msg or "not supported" in err_msg:
-                        continue 
-                    return f"AI Generation Error ({model_name}): {str(e)}"
+                    last_error = str(e)
+                    continue # Try next available model
             
-            return "AI Analysis Error: No compatible Gemini models found for this API key. Please check if your key is active and has access to Gemini models at Google AI Studio."
+            return f"AI Analysis Error: Could not find or access a compatible Gemini model. (Last Error: {last_error}). Please ensure your API key has 'Generative Language API' enabled in Google Cloud Console."
         except Exception as e:
             return f"AI Config Error: {str(e)}"
 
