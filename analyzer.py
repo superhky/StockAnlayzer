@@ -36,7 +36,10 @@ class StockAnalyzer:
         if api_key and len(name) > 1:
             try:
                 genai.configure(api_key=api_key)
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                try:
+                    model = genai.GenerativeModel('gemini-1.5-flash')
+                except:
+                    model = genai.GenerativeModel('gemini-pro')
                 prompt = f"Find the stock ticker for company '{name}'. Respond ONLY with the ticker symbol (e.g. 005930.KS or AAPL)."
                 response = model.generate_content(prompt)
                 ticker = response.text.strip()
@@ -216,10 +219,18 @@ class StockAnalyzer:
         if not api_key: return "API Key is required."
         try:
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            # Try 1.5-flash first (standard for Google AI Studio)
+            try:
+                model = genai.GenerativeModel('gemini-1.5-flash')
+            except:
+                # Fallback to older gemini-pro if 1.5-flash is not available in the region
+                model = genai.GenerativeModel('gemini-pro')
+                
             prompt = f"Analyze {ticker}. Price: {price_info}, Technicals: {technicals}, News: {news}. Context: {avg_purchase_price}. Respond in {language}."
             return model.generate_content(prompt).text
-        except Exception as e: return str(e)
+        except Exception as e:
+            # Final fallback message
+            return f"AI Analysis Error: {str(e)}"
 
 if __name__ == "__main__":
     analyzer = StockAnalyzer()
