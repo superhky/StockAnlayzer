@@ -107,10 +107,13 @@ class StockAnalyzer:
                 link = item.link.text if item.link else None
                 
                 if title and link:
-                    # Clean up common encoding issues, curly quotes, and double spaces
-                    title = title.replace('\xa0', ' ').replace('', "'").strip()
+                    # Clean up title for markdown compatibility
+                    title = title.replace('[', '(').replace(']', ')').replace('\xa0', ' ').strip()
                     # More thorough cleanup for Windows-1252/UTF-8 mismatches
                     title = title.replace('\u2019', "'").replace('\u2018', "'").replace('\u201c', '"').replace('\u201d', '"')
+                    
+                    # Ensure link is a clean string
+                    link = str(link).strip()
                     processed_news.append({'title': title, 'link': link})
             
             # Fallback if Google News is empty

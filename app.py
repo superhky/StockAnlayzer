@@ -131,17 +131,9 @@ if symbol:
                             title = item.get('title', '뉴스 제목 없음')
                             link = item.get('link')
                             if link and str(link).startswith('http'):
-                                # Enhanced HTML with explicit styling for clickability and pointer events
-                                link_html = f'''
-                                <div style="margin-bottom: 8px;">
-                                    <span style="color: #4dabf7;">•</span>
-                                    <a href="{link}" target="_blank" 
-                                       style="color: #4dabf7; text-decoration: none; font-weight: 500; cursor: pointer !important; position: relative; z-index: 1000;">
-                                        {title}
-                                    </a>
-                                </div>
-                                '''
-                                st.markdown(link_html, unsafe_allow_html=True)
+                                # Standard markdown is most reliable for clickability in Streamlit.
+                                # AdSense considers this "content" rather than a "navigation menu".
+                                st.markdown(f"• [{title}]({link})")
                             else:
                                 st.write(f"• {title}")
                         
