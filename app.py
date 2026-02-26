@@ -41,8 +41,19 @@ st.markdown("""
         border-left: 5px solid #007bff;
         margin-bottom: 20px;
     }
+    .ad-label {
+        font-size: 10px;
+        color: #888;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 10px 0;
+    }
     </style>
     """, unsafe_allow_html=True)
+
+# Top Ad Label
+st.markdown('<div class="ad-label">ADVERTISEMENT</div>', unsafe_allow_html=True)
 
 st.title("📈 AI Stock Analyzer")
 
@@ -81,19 +92,21 @@ texts = {
         "ai_report": "🤖 Meta AI Analysis Report",
         "ai_warning": "Enter Gemini API Key in the sidebar to see AI analysis.",
         "start_info": "Enter a stock ticker and press 'Start Analysis'.",
-        "features_title": "📈 Key Features",
+        "features_title": "📈 Key Features & Methodology",
         "features_list": """
-        - **Technical Analysis**: Real-time calculation of RSI, MACD, Bollinger Bands, etc.
-        - **Latest News Integration**: Check major news for each stock at a glance.
-        - **AI Report**: Custom investment strategy based on news and technical indicators.
+        - **Comprehensive Technical Analysis**: Our system performs real-time calculations of essential market indicators including RSI (Relative Strength Index) to identify overbought or oversold conditions, MACD (Moving Average Convergence Divergence) for trend momentum, and Bollinger Bands for volatility analysis.
+        - **Real-Time News Aggregation**: We integrate the latest financial news from reliable sources like Yahoo Finance and Naver Finance, providing you with the context behind the price movements.
+        - **AI-Powered Insights**: Utilizing the Gemini Pro model, our analyzer synthesizes technical data and news sentiment to generate a structured investment strategy report, helping you make informed decisions based on data.
+        - **Global Market Support**: Support for both KOSPI/KOSDAQ (Korea) and NYSE/NASDAQ (USA) stocks with automatic currency and ticker resolution.
         """,
-        "how_to_title": "💡 How to Use",
+        "how_to_title": "💡 How to Use the Stock Analyzer",
         "how_to_list": """
-        1. Enter **Gemini API Key** in the sidebar (Optional).
-        2. Enter the **Stock Ticker or Company Name**.
-        3. Press **'Start Analysis'** to see the report.
+        1. **Configuration**: (Optional) Enter your Gemini API Key in the left sidebar. This enables the advanced AI Analysis feature. Your key is processed locally and never stored on our servers.
+        2. **Search**: Enter a stock ticker symbol (e.g., 'AAPL' or '005930') or a company name in the search field.
+        3. **Entry Price**: If you already hold the stock, enter your average purchase price to receive a personalized performance analysis.
+        4. **Analyze**: Click the 'Start Analysis' button. The system will fetch historical data, calculate indicators, and generate your report in seconds.
         """,
-        "legal": "The information provided is for reference only. Final investment responsibility lies with the user.",
+        "legal": "The information provided by Pro Stock Analyzer is for reference only. Investment involves risk. Final investment responsibility lies entirely with the user. We recommend consulting with a professional financial advisor.",
         "privacy": "Privacy Policy",
         "terms": "Terms of Use"
     },
@@ -125,19 +138,21 @@ texts = {
         "ai_report": "🤖 Meta AI 분석 리포트",
         "ai_warning": "AI 분석을 보려면 사이드바에 Gemini API Key를 입력하세요.",
         "start_info": "종목 티커를 입력하고 '분석 시작' 버튼을 누르세요.",
-        "features_title": "#### 📈 주요 기능",
+        "features_title": "#### 📈 주요 기능 및 분석 방법",
         "features_list": """
-        - **기술적 지표 분석**: RSI, MACD, 볼린저 밴드 등 핵심 지표 실시간 계산
-        - **최신 뉴스 통합**: 종목별 주요 뉴스를 한눈에 확인
-        - **인공지능 리포트**: 종목별 주요 뉴스와 기술적 지표 분석을 바탕으로 맞춤형 투자 전략 제안
+        - **심층 기술적 지표 분석**: RSI(상대강도지수)를 통한 과매수/과매도 판단, MACD를 활용한 추세 확인, 볼린저 밴드를 통한 변동성 분석 등 핵심 기술적 지표를 실시간으로 계산합니다.
+        - **최신 뉴스 통합 엔진**: 네이버 금융 및 Yahoo Finance 등 신뢰할 수 있는 소스로부터 해당 종목의 최신 주요 뉴스를 수집하여 가격 변동의 배경을 파악할 수 있게 돕습니다.
+        - **인공지능 리포트 생성**: Google의 최신 Gemini Pro 모델을 사용하여 수집된 기술적 데이터와 뉴스 심리 분석을 결합, 객관적이고 체계적인 맞춤형 투자 전략 리포트를 제공합니다.
+        - **글로벌 시장 통합**: 한국(KOSPI, KOSDAQ) 시장과 미국(NYSE, NASDAQ) 시장을 모두 지원하며, 티커 및 기업명 자동 인식 기능을 제공합니다.
         """,
-        "how_to_title": "#### 💡 사용 방법",
+        "how_to_title": "#### 💡 스톡 분석기 사용 방법",
         "how_to_list": """
-        1. 왼쪽 사이드바에 **Gemini API Key**를 입력합니다 (선택 사항).
-        2. 분석하고 싶은 **종목 티커 또는 영어 이름**을 입력합니다.
-        3. '분석 시작' 버튼을 눌러 결과 보고서를 확인합니다.
+        1. **API 설정**: (선택 사항) 왼쪽 사이드바에 **Gemini API Key**를 입력합니다. 이는 고급 AI 분석 기능을 활성화하는 데 필요하며, 입력된 키는 저장되지 않고 안전하게 처리됩니다.
+        2. **종목 입력**: 분석하고자 하는 **종목 티커(예: 005930)** 또는 **영어 이름**을 검색창에 입력합니다.
+        3. **평단가 입력**: 이미 종목을 보유 중인 경우, 본인의 평균 매수 가격을 입력하면 현재가 대비 수익률 및 대응 전략을 포함한 맞춤형 리포트를 받을 수 있습니다.
+        4. **분석 실행**: '분석 시작' 버튼을 누르면 시스템이 데이터를 수집하고 분석을 시작하며, 수 초 내에 시각화된 리포트를 화면에 표시합니다.
         """,
-        "legal": "본 서비스에서 제공하는 정보는 투자 참고용이며, 투자에 대한 최종 책임은 본인에게 있습니다.",
+        "legal": "본 서비스에서 제공하는 모든 정보는 투자 참고용이며, 실제 투자 결과에 대한 법적 책임은 사용자 본인에게 있습니다. 투자는 신중하게 결정하시길 권고드립니다.",
         "privacy": "개인정보 처리방침",
         "terms": "이용 약관"
     }
@@ -153,6 +168,14 @@ with st.sidebar:
     api_key = st.text_input("Gemini API Key", type="password", help=t['api_key_help'])
     st.info(t['api_key_info'])
     st.divider()
+    
+    # Content for AdSense
+    st.markdown("#### 🔍 About Pro Stock Analyzer")
+    st.caption("""
+    This application is designed to provide retail investors with institutional-grade technical analysis and AI-driven news sentiment synthesis. 
+    By combining quantitative data with qualitative news context, we help you see the bigger picture.
+    """)
+    st.divider()
     st.markdown(t['dev_by'])
 
 # Main Content
@@ -162,12 +185,14 @@ with col1:
     symbol = st.text_input(t['input_label'], placeholder=t['input_placeholder'])
     st.caption(t['help_caption'])
     purchase_price = st.number_input(t['purchase_price'], min_value=0.0, value=0.0, format="%.2f", help=t['purchase_price_help'])
+    st.write("") # Spacer to prevent ad overlap with button
+    analyze_btn = st.button(t['analyze_btn'], use_container_width=True)
 
 if symbol:
     # Resolve symbol
     analyzer = StockAnalyzer()
     
-    if st.button(t['analyze_btn']):
+    if analyze_btn:
         # Show a resolving message if it's likely a name
         with st.spinner(f"{t['analyzing']} '{symbol}'..."):
             resolved_ticker = analyzer.get_ticker(symbol, api_key=api_key)
@@ -242,8 +267,10 @@ if symbol:
                                 st.markdown(f"**{i+1}. {title}**")
                             with n_col2:
                                 st.link_button(t['view_article'], link, use_container_width=True)
+                            st.markdown('<div style="margin-bottom: 15px;"></div>', unsafe_allow_html=True)
                         else:
                             st.write(f"• {title}")
+                            st.markdown('<div style="margin-bottom: 10px;"></div>', unsafe_allow_html=True)
                     
                     # Source attribution
                     if not resolved_ticker.endswith(('.KS', '.KQ')):
@@ -288,13 +315,51 @@ else:
         st.markdown(t['how_to_list'])
 
 # Footer & Legal (Crucial for AdSense approval)
+st.markdown('<div class="ad-label">ADVERTISEMENT</div>', unsafe_allow_html=True)
 st.markdown("---")
-footer_col1, footer_col2, footer_col3 = st.columns([2, 1, 1])
+
+# Handle Privacy Policy and Terms of Use via query parameters
+query_params = st.query_params
+
+if "page" in query_params:
+    if query_params["page"] == "privacy":
+        st.subheader(t['privacy'])
+        st.write("""
+        ### Privacy Policy
+        We value your privacy. This service does not store your personal stock data or API keys on our servers.
+        - **Data Collection**: We do not collect personal identification information.
+        - **Cookies**: We may use cookies to improve user experience.
+        - **Third-party Services**: We use Google AdSense and Gemini API. Please refer to their respective privacy policies.
+        """)
+        if st.button("Back to App"):
+            st.query_params.clear()
+            st.rerun()
+        st.stop()
+    elif query_params["page"] == "terms":
+        st.subheader(t['terms'])
+        st.write("""
+        ### Terms of Use
+        - **Disclaimer**: This app is for informational purposes only. Not financial advice.
+        - **Accuracy**: We do not guarantee the accuracy of the data provided by third-party APIs.
+        - **Responsibility**: Users are responsible for their own investment decisions.
+        """)
+        if st.button("Back to App"):
+            st.query_params.clear()
+            st.rerun()
+        st.stop()
+
+footer_col1, footer_col2, footer_col3, footer_col4 = st.columns([2, 1, 1, 1])
 with footer_col1:
-    st.caption(f"© 2024 Pro Stock AI Analyzer. All rights reserved.")
+    st.caption(f"© 2026 Pro Stock AI Analyzer. All rights reserved.")
     st.caption(t['legal'])
 with footer_col2:
-    st.markdown(f"[{t['privacy']}](#)")
+    if st.button(t['privacy'], key="footer_privacy"):
+        st.query_params["page"] = "privacy"
+        st.rerun()
 with footer_col3:
-    st.markdown(f"[{t['terms']}](#)")
+    if st.button(t['terms'], key="footer_terms"):
+        st.query_params["page"] = "terms"
+        st.rerun()
+with footer_col4:
+    st.write("📧 [Contact](mailto:contact@antigravity.com)")
 

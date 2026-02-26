@@ -233,7 +233,27 @@ class StockAnalyzer:
         if not api_key: return "API Key is required."
         try:
             genai.configure(api_key=api_key)
-            prompt = f"Analyze {ticker}. Price: {price_info}, Technicals: {technicals}, News: {news}. Context: {avg_purchase_price}. Respond in {language}."
+            
+            purchase_context = f"The user's average purchase price is {avg_purchase_price}." if avg_purchase_price else "The user does not currently hold this stock."
+            
+            prompt = f"""
+            You are a professional stock analyst. Analyze the stock '{ticker}' based on the provided data and provide a structured report in {language}.
+
+            [Data Provided]
+            - Price Info: {price_info}
+            - Technical Indicators: {technicals}
+            - Latest News: {news}
+            - Context: {purchase_context}
+
+            [Report Requirements]
+            1. **Technical Analysis Summary**: Briefly interpret the RSI, MACD, and Bollinger Bands.
+            2. **News Sentiment Analysis**: Summarize the impact of recent news on the stock's future.
+            3. **Short-term Strategy (1-4 weeks)**: Provide a specific action plan (Buy/Hold/Sell) with target price and stop-loss.
+            4. **Long-term Strategy (6 months+)**: Provide a fundamental outlook and growth potential.
+            5. **Final Investment Conclusion**: A concise summary including risk factors.
+
+            Ensure the tone is professional, objective, and data-driven.
+            """
             
             # 1. Try to discover available models for this specific API key
             available_models = []
