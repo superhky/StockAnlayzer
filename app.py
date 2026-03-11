@@ -369,7 +369,6 @@ def show_home():
             st.markdown(t['how_to_title'])
             st.markdown(t['how_to_list'])
     
-    render_ad(t)
     st.caption(t['disclaimer_title'])
 
 def show_about():
