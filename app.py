@@ -376,25 +376,21 @@ def show_about():
     st.title(t['nav_about'])
     st.markdown(f'<div class="legal-container">{t["about_long"]}</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="disclaimer-box"><span class="red-bold">{t["disclaimer_title"]}</span><br>{t["disclaimer_text"]}</div>', unsafe_allow_html=True)
-    render_ad(t)
 
 def show_privacy():
     t = get_content(st.session_state['lang'])
     st.title(t['nav_privacy'])
     st.markdown(f'<div class="legal-container">{t["privacy_long"]}</div>', unsafe_allow_html=True)
-    render_ad(t)
 
 def show_terms():
     t = get_content(st.session_state['lang'])
     st.title(t['nav_terms'])
     st.markdown(f'<div class="legal-container">{t["terms_long"]}</div>', unsafe_allow_html=True)
-    render_ad(t)
 
 def show_contact():
     t = get_content(st.session_state['lang'])
     st.title(t['nav_contact'])
     st.markdown(f"📧 **Email**: superhky@hotmail.com")
-    render_ad(t)
 
 def main():
     if 'lang' not in st.session_state: st.session_state['lang'] = '한국어'
