@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import plotly.graph_objects as go
 from analyzer import StockAnalyzer
@@ -8,6 +9,30 @@ st.set_page_config(
     page_title="AI 한국 / 미국 주식 분석기",
     layout="wide",
     initial_sidebar_state="expanded"
+)
+
+# --- AdSense Verification Code ---
+components.html(
+    """
+    <script>
+        // Inject AdSense script into the parent <head>
+        const head = window.parent.document.getElementsByTagName('head')[0];
+        
+        // Add script tag
+        const adsenseScript = window.parent.document.createElement('script');
+        adsenseScript.async = true;
+        adsenseScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8764053427630602";
+        adsenseScript.crossOrigin = "anonymous";
+        head.appendChild(adsenseScript);
+
+        // Add meta tag for AdSense account verification
+        const meta = window.parent.document.createElement('meta');
+        meta.name = "google-adsense-account";
+        meta.content = "ca-pub-8764053427630602";
+        head.appendChild(meta);
+    </script>
+    """,
+    height=0,
 )
 
 # --- Enhanced CSS: High-Visibility Light Theme ---
